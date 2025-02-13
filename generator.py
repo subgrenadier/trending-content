@@ -123,10 +123,10 @@ class TrendingContentGenerator:
 """
         
         # Save to _posts directory
-        posts_dir = Path('_posts')
+        posts_dir = Path('posts')
         posts_dir.mkdir(exist_ok=True)
         
-        post_file = posts_dir / f"{today}-{slug}.md"
+        post_file = posts_dir / f"{today}-{slug}.html"
         post_file.write_text(post_content)
         
         return post_file
