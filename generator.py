@@ -62,7 +62,7 @@ class TrendingContentGenerator:
         try:
             response = requests.get(trends_url, params=params)
             # Remove ")]}'" from the beginning of the response
-            clean_data = response.text[5:]
+            clean_data = response.text[10:]
             data = json.loads(clean_data)
             
             trends = []
@@ -140,8 +140,8 @@ class TrendingContentGenerator:
         
         # Get all posts
         posts = []
-        posts_dir = Path('_posts')
-        for post_file in posts_dir.glob('*.md'):
+        posts_dir = Path('posts')
+        for post_file in posts_dir.glob('*.html'):
             try:
                 content = self.safe_read_file(post_file)
                 # Parse frontmatter and content
