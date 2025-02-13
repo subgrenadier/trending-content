@@ -62,7 +62,7 @@ class TrendingContentGenerator:
         try:
             response = requests.get(trends_url, params=params)
             # Remove ")]}'" from the beginning of the response
-            clean_data = response.text[10:]
+            clean_data = response.text[5:]
             data = json.loads(clean_data)
             
             trends = []
@@ -103,11 +103,12 @@ class TrendingContentGenerator:
 
     def create_post(self, keyword, content):
         """
-        Creates a markdown file with YAML frontmatter for the generated content.
+        Creates an HTML file for the generated content inside a folder.
         """
         today = datetime.datetime.now().strftime('%Y-%m-%d')
         slug = keyword.lower().replace(' ', '-')
-        
+
+        # Frontmatter metadata (optional, can be removed if not needed)
         frontmatter = {
             'title': keyword,
             'date': today,
@@ -115,20 +116,46 @@ class TrendingContentGenerator:
             'description': f"Latest updates and insights about {keyword} in Malaysia",
             'slug': slug
         }
-        
-        post_content = f"""---
-{yaml.dump(frontmatter)}---
 
-{content}
-"""
-        
-        # Save to _posts directory
-        posts_dir = Path('posts')
-        posts_dir.mkdir(exist_ok=True)
-        
-        post_file = posts_dir / f"{today}-{slug}.html"
-        post_file.write_text(post_content)
-        
+        # Define the post directory and file
+        post_dir = Path(f'posts/{slug}')
+        post_dir.mkdir(parents=True, exist_ok=True)  # Create folder for the post
+
+        post_file = post_dir / 'index.html'  # Save as index.html inside the folder
+
+        # HTML content with metadata
+        post_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{keyword} - Trending Content</title>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-gray-100">
+            <header class="bg-white shadow-md">
+                <div class="container mx-auto px-4 py-6">
+                    <h1 class="text-3xl font-bold text-gray-800">{keyword}</h1>
+                </div>
+            </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <article class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">{keyword}</h2>
+                <p class="text-gray-600 mb-4">{today}</p>
+                <div class="prose">
+                    {content}
+                </div>
+            </article>
+        </main>
+        </body>
+        </html>
+        """
+
+        # Write the content to index.html
+        post_file.write_text(post_content, encoding="utf-8")
+
         return post_file
 
     def generate_site(self):
